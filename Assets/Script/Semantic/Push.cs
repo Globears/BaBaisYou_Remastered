@@ -14,7 +14,7 @@ public class Push : Semantic
     {
         if (_owner == null) return true;
         if (gridObject == _owner) return true;
-        if (newPosition != _owner.Position) return true; 
+        if (newPosition != _owner.Position) return true;
 
         if (_owner.Move(newPosition + newPosition - oldPosition))
         {
@@ -25,5 +25,10 @@ public class Push : Semantic
         {
             return false;
         }
+    }
+
+    private void OnDestroy()
+    {
+        GridObject.OnMovingRequest -= OnMovingRequest;
     }
 }

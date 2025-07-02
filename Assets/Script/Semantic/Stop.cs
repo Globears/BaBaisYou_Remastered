@@ -13,7 +13,7 @@ public class Stop : Semantic
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private bool OnMovingRequest(GridObject gridObject, Vector2Int oldPosition, Vector2Int newPosition)
@@ -27,5 +27,10 @@ public class Stop : Semantic
         }
         // Otherwise, return false to indicate that the request is not handled
         return false;
+    }
+
+    private void OnDestroy()
+    {
+        GridObject.OnMovingRequest -= OnMovingRequest;
     }
 }

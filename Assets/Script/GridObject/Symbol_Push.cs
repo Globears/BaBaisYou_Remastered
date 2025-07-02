@@ -1,13 +1,13 @@
 using System;
 using UnityEngine;
 
-public class Symbol_Wall : ObjectSymbol
+public class Symbol_Push : SemanticSymbol
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Awake()
     {
         base.Awake();
-        refer = typeof(Wall);
+        refer = typeof(Push);
     }
 
     // Update is called once per frame

@@ -99,7 +99,7 @@ public class Semantic_Is : MonoBehaviour
         }
         else
         {//is周围的方块在动
-            
+
             if (Vector2Int.Distance(_owner.Position, oldPosition) <= 1.1)
             {
                 GridObject opposite;
@@ -115,7 +115,7 @@ public class Semantic_Is : MonoBehaviour
                     Type objectType = gridObject.GetComponent<ObjectSymbol>().refer;
                     Type semanticType = opposite.GetComponent<SemanticSymbol>().refer;
                     pairedObjects.Remove(new Pair(objectType, semanticType));
-                } 
+                }
             }
             if (Vector2Int.Distance(_owner.Position, newPosition) <= 1.1)
             {
@@ -134,12 +134,16 @@ public class Semantic_Is : MonoBehaviour
                     pairedObjects.Add(new Pair(objectType, semanticType));
                 }
             }
-            
+
         }
         if (!isPreparedToUpdating)
         {
             isPreparedToUpdating = true;
             StartCoroutine(UpdateSemanticComponent());
+        }
+        foreach (Pair pair in pairedObjects)
+        {
+            Debug.Log($"{pair.semanticType} {pair.objectType}");
         }
         
     }
@@ -160,6 +164,7 @@ public class Semantic_Is : MonoBehaviour
         yield return new WaitForEndOfFrame();
         //更新所有
         OnSemanticRemove?.Invoke(typeof(Semantic), typeof(GridObject));
+        yield return new WaitForEndOfFrame();
         foreach (Pair pair in pairedObjects)
         {
             OnSemanticAdd?.Invoke(pair.semanticType, pair.objectType);

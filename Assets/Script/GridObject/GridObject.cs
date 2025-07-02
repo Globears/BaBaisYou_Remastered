@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
@@ -72,6 +73,22 @@ public abstract class GridObject : MonoBehaviour
         transform.position = new Vector3(Position.x, Position.y, 0);
     }
 
+    private IEnumerator SmoothMove(Vector2Int StartPosition, Vector2Int EndPosition)
+    {
+        float duration = 0.1f;
+        float elapsedTime = 0;
+
+        Vector3 Start = new Vector3(StartPosition.x, StartPosition.y, 0);
+        Vector3 End = new Vector3(EndPosition.x, EndPosition.y, 0);
+
+        while (elapsedTime <= duration)
+        {
+            elapsedTime += Time.deltaTime;
+            transform.position = Vector3.Lerp(Start, End, elapsedTime / duration);
+            yield return null;
+        }
+    }
+
     public bool Move(Vector2Int targetPosition)
     {
         if (!RaiseMovingRequest(this, Position, targetPosition)) return false;
@@ -83,17 +100,17 @@ public abstract class GridObject : MonoBehaviour
         Position = newPosition;
         RaiseMovingEnd(this, oldPosition, newPosition);
 
-        UpdateVisualPosition();
+        //UpdateVisualPosition();
+        StartCoroutine(SmoothMove(oldPosition, newPosition));
         return true;
     }
 
     protected virtual void OnSemanticAdd(Type semanticType, Type objectType)
     {
         // Handle the semantic addition logic here
-        if (objectType.IsAssignableFrom(this.GetType()) )
+        if (objectType.IsAssignableFrom(this.GetType()) && GetComponent(semanticType) == null)
         {
             // For example, you can log the semantic type added to Baba
-            Debug.Log($"Semantic {semanticType.Name} added to .");
             gameObject.AddComponent(semanticType);
         }
     }
@@ -103,7 +120,6 @@ public abstract class GridObject : MonoBehaviour
         if (objectType.IsAssignableFrom(this.GetType()) )
         {
             // For example, you can log the semantic type added to Baba
-            Debug.Log($"Semantic {semanticType.Name} removed");
             Component[] components = gameObject.GetComponents(semanticType);
 
 
