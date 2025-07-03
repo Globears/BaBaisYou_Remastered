@@ -17,7 +17,7 @@ public abstract class GridObject : MonoBehaviour
     public delegate void MovingEventHandler(GridObject gridObject, Vector2Int oldPosition, Vector2Int newPosition);
     public static event MovingEventHandler OnMovingStart, OnMovingEnd, OnRegisterPosition;
 
-    protected bool RaiseMovingRequest(GridObject gridObject, Vector2Int oldPosition, Vector2Int newPosition)
+    public bool RaiseMovingRequest(GridObject gridObject, Vector2Int oldPosition, Vector2Int newPosition)
     {
         if (OnMovingRequest != null)
         {
@@ -59,7 +59,7 @@ public abstract class GridObject : MonoBehaviour
     {
         Position = new Vector2Int(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
         RaiseRegisterPosition(this, Position, Position);
-        
+
     }
 
     // Update is called once per frame
@@ -91,7 +91,6 @@ public abstract class GridObject : MonoBehaviour
 
     public bool Move(Vector2Int targetPosition)
     {
-        if (!RaiseMovingRequest(this, Position, targetPosition)) return false;
 
         Vector2Int oldPosition = Position;
         Vector2Int newPosition = targetPosition;
@@ -101,6 +100,7 @@ public abstract class GridObject : MonoBehaviour
         RaiseMovingEnd(this, oldPosition, newPosition);
 
         //UpdateVisualPosition();
+        StopCoroutine("SmoothMove");
         StartCoroutine(SmoothMove(oldPosition, newPosition));
         return true;
     }
@@ -117,7 +117,7 @@ public abstract class GridObject : MonoBehaviour
 
     protected virtual void OnSemanticRemove(Type semanticType, Type objectType)
     {
-        if (objectType.IsAssignableFrom(this.GetType()) )
+        if (objectType.IsAssignableFrom(this.GetType()))
         {
             // For example, you can log the semantic type added to Baba
             Component[] components = gameObject.GetComponents(semanticType);
@@ -128,5 +128,14 @@ public abstract class GridObject : MonoBehaviour
                 Destroy(comp);
             }
         }
+    }
+
+    public bool WithSemantic(Type semanticType)
+    {
+        if (GetComponent(semanticType) != null)
+        {
+            return true;
+        }
+        return false;
     }
 }

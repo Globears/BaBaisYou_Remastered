@@ -8,6 +8,7 @@ public class Push : Semantic
     {
         base.Awake();
         GridObject.OnMovingRequest += OnMovingRequest;
+        GridObject.OnMovingStart += OnMovingStart;
     }
 
     private bool OnMovingRequest(GridObject gridObject, Vector2Int oldPosition, Vector2Int newPosition)
@@ -16,19 +17,26 @@ public class Push : Semantic
         if (gridObject == _owner) return true;
         if (newPosition != _owner.Position) return true;
 
-        if (_owner.Move(newPosition + newPosition - oldPosition))
+        if (_owner.RaiseMovingRequest(_owner, _owner.Position, _owner.Position + newPosition - oldPosition))
         {
-            //如果可以沿着移动方向被推动，就允许推动者移动
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
+
+    private void OnMovingStart(GridObject gridObject, Vector2Int oldPosition, Vector2Int newPosition)
+    {
+        if (gridObject == _owner) return;
+        if (newPosition != _owner.Position) return;
+        _owner.Move(newPosition + newPosition - oldPosition);
+    }
+
+
 
     private void OnDestroy()
     {
         GridObject.OnMovingRequest -= OnMovingRequest;
+        GridObject.OnMovingStart -= OnMovingStart;
     }
 }
